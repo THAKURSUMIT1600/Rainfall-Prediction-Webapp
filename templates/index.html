@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rainfall Prediction</title>
+    <style>
+      /* Global Styles */
+      :root {
+        --primary: #2389ff;
+        --secondary: #03a9f4;
+        --dark: #333;
+        --light: #f8f9fa;
+        --success: #28a745;
+        --danger: #dc3545;
+        --warning: #ffc107;
+        --info: #17a2b8;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --border-radius: 8px;
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        color: var(--dark);
+        line-height: 1.6;
+      }
+
+      /* Navigation */
+      nav {
+        background-color: #fff;
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+      }
+
+      .navigation a {
+        color: var(--dark);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        cursor: pointer;
+      }
+
+      .navigation a:hover {
+        background-color: rgba(35, 137, 255, 0.1);
+        color: var(--primary);
+      }
+
+      .active-nav {
+        color: var(--primary) !important;
+        background-color: rgba(35, 137, 255, 0.1);
+      }
+
+      /* Sections */
+      section {
+        padding: 2rem 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* Home Section */
+      #home {
+        text-align: center;
+        position: relative;
+        border-radius: var(--border-radius);
+        margin-top: 2rem;
+      }
+
+      #home::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text:var(--dark)
+        border-radius: var(--border-radius);
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        padding: 4rem 2rem;
+      }
+
+      .info {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .info h2 {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+      }
+
+      .info h2 span {
+        color: var(--secondary);
+      }
+
+      .info p {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        line-height: 1.8;
+      }
+
+      .info-btn {
+        display: inline-block;
+        background-color: var(--primary);
+        color: white;
+        padding: 0.8rem 2rem;
+        margin: 0 0.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: var(--transition);
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+      }
+
+      .info-btn:hover {
+        background-color: #1a75d2;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* About Section */
+      #about {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 3rem;
+        margin: 2rem auto;
+      }
+
+      #about h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--primary);
+        text-align: center;
+      }
+
+      .about-content {
+        font-size: 1.1rem;
+        text-align: justify;
+      }
+
+      .about-content a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .about-content a:hover {
+        text-decoration: underline;
+      }
+
+      /* Predict Section */
+      #predict {
+        margin: 2rem auto;
+      }
+
+      .form {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 2rem;
+      }
+
+      .ph1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        color: var(--primary);
+        text-align: center;
+      }
+
+      .ml-input {
+        margin-bottom: 2rem;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .col1,
+      .col2,
+      .col3,
+      .col4 {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(35, 137, 255, 0.2);
+      }
+
+      select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
+      }
+
+      button {
+        display: block;
+        background-color: var(--primary);
+        color: white;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        margin: 0 auto;
+      }
+
+      button:hover {
+        background-color: #1a75d2;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Utility Classes */
+      .hidden {
+        display: none;
+      }
+
+      /* Card Layout for Form Fields */
+      .input-card {
+        background-color: #f8f9fa;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        transition: var(--transition);
+      }
+
+      .input-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-group {
+        margin-bottom: 0.5rem;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .field-section {
+        margin-bottom: 2rem;
+      }
+
+      .field-title {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+
+        .navigation {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .info h2 {
+          font-size: 2rem;
+        }
+
+        #about,
+        .form {
+          padding: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav>
+      <header class="nav-container">
+        <div class="navigation">
+          <a id="nav-home" onclick="navFunction('home')" class="active-nav"
+            >Home</a
+          >
+          <a id="nav-about" onclick="navFunction('about')">About</a>
+          <a id="nav-predict" onclick="navFunction('predict')"
+            >Start Prediction</a
+          >
+        </div>
+      </header>
+    </nav>
+
+    <section id="home" style="background-color: #e2d7d7; padding: 60px 20px">
+      <div class="content">
+        <div class="info">
+          <h2>Rainfall Prediction <br /><span></span></h2>
+          <p>
+            Welcome to our Rainfall Prediction app! We use machine learning to
+            predict whether it will rain tomorrow based on weather data. Just
+            enter a few weather details, and we’ll tell you the forecast.
+          </p>
+          <a class="info-btn" onclick="navFunction('about')">Learn More</a>
+          <a class="info-btn" onclick="navFunction('predict')"
+            >Make Prediction</a
+          >
+        </div>
+      </div>
+      <section style="background-color: #f4f4f4; padding: 60px 20px">
+        <div class="content" style="max-width: 1200px; margin: 0 auto">
+          <h2 style="text-align: center; font-size: 32px; margin-bottom: 20px">
+            How It Works
+          </h2>
+          <p style="text-align: center; font-size: 18px; margin-bottom: 40px">
+            Our Rainfall Prediction app uses advanced machine learning models to
+            analyze weather patterns and predict if it will rain tomorrow. By
+            gathering data from various weather parameters like temperature,
+            humidity, and pressure, the model makes accurate predictions based
+            on historical trends.
+          </p>
+          <ul style="list-style-type: none; text-align: center">
+            <li style="font-size: 18px; margin-bottom: 10px">
+              Step 1: Enter weather data (temperature, humidity, etc.)
+            </li>
+            <li style="font-size: 18px; margin-bottom: 10px">
+              Step 2: Our machine learning model processes the data
+            </li>
+            <li style="font-size: 18px; margin-bottom: 10px">
+              Step 3: Get the prediction for tomorrow's weather!
+            </li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
+    <section id="about" class="hidden">
+      <div>
+        <h2>About</h2>
+        <p class="about-content">
+          Our Rainfall Prediction application leverages advanced machine
+          learning models to forecast the likelihood of rainfall based on
+          historical weather data across Australia.
+          <br /><br />
+          Built using the Rain Prediction in Australia dataset, our backend
+          system—developed in Flask—takes multiple meteorological parameters
+          such as temperature, rainfall, humidity, wind speed, pressure, cloud
+          cover, and more as input to make accurate predictions.
+          <br /><br />
+          To enhance the reliability and precision of our forecasts, we employ:
+          <br />• Data preprocessing and normalization<br />• Outlier
+          detection<br />• Correlation analysis<br />• Feature selection
+          <br /><br />
+          Our model is powered by the XGBoost algorithm, selected for its high
+          performance and ability to handle complex, non-linear relationships in
+          the data.
+          <br /><br />
+          Additionally, we incorporated PCA for dimensionality reduction and
+          K-Means clustering to identify regional weather patterns, making our
+          model robust and location-aware.
+          <br /><br />
+          Users input relevant weather data through a simple web form, and the
+          Flask server processes the request, scales the data, and feeds it into
+          the trained model to predict whether it will rain the next day.
+        </p>
+      </div>
+    </section>
+
+    <section id="predict" class="hidden">
+      <form action="/predict" method="POST" class="form">
+        <h1 class="ph1">Weather Data Input</h1>
+
+        <div class="ml-input">
+          <!-- Temperature Section -->
+          <div class="field-section">
+            <h3 class="field-title">Temperature Data</h3>
+            <div class="row">
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="mintemp">Minimum Temperature (°C)</label>
+                  <input
+                    type="text"
+                    id="mintemp"
+                    name="mintemp"
+                    placeholder="e.g. 15.2"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="maxtemp">Maximum Temperature (°C)</label>
+                  <input
+                    type="text"
+                    id="maxtemp"
+                    name="maxtemp"
+                    placeholder="e.g. 28.5"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="temp9am">Temperature at 9am (°C)</label>
+                  <input
+                    type="text"
+                    id="temp9am"
+                    name="temp9am"
+                    placeholder="e.g. 19.4"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="temp3pm">Temperature at 3pm (°C)</label>
+                  <input
+                    type="text"
+                    id="temp3pm"
+                    name="temp3pm"
+                    placeholder="e.g. 26.8"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wind Section -->
+          <div class="field-section">
+            <h3 class="field-title">Wind Conditions</h3>
+            <div class="row">
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="windgustspeed">Wind Gust Speed (km/h)</label>
+                  <input
+                    type="text"
+                    id="windgustspeed"
+                    name="windgustspeed"
+                    placeholder="e.g. 46.0"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="windgustdir">Wind Gust Direction</label>
+                  <select id="windgustdir" name="windgustdir" required>
+                    <option value="" disabled selected>Select direction</option>
+                    <option value="3">North</option>
+                    <option value="4">West</option>
+                    <option value="7">South</option>
+                    <option value="15">East</option>
+                    <option value="1">Northwest</option>
+                    <option value="11">Northeast</option>
+                    <option value="9">Southwest</option>
+                    <option value="12">Southeast</option>
+                    <option value="0">North-Northwest</option>
+                    <option value="6">North-Northeast</option>
+                    <option value="8">South-Southwest</option>
+                    <option value="10">South-Southeast</option>
+                    <option value="2">West-Northwest</option>
+                    <option value="5">West-Southwest</option>
+                    <option value="14">East-Northeast</option>
+                    <option value="13">East-Southeast</option>
+                  </select>
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="windspeed9am">Wind Speed at 9am (km/h)</label>
+                  <input
+                    type="text"
+                    id="windspeed9am"
+                    name="windspeed9am"
+                    placeholder="e.g. 15.0"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="winddir9am">Wind Direction at 9am</label>
+                  <select id="winddir9am" name="winddir9am" required>
+                    <option value="" disabled selected>Select direction</option>
+                    <option value="1">North</option>
+                    <option value="5">West</option>
+                    <option value="10">South</option>
+                    <option value="15">East</option>
+                    <option value="2">Northwest</option>
+                    <option value="9">Northeast</option>
+                    <option value="7">Southwest</option>
+                    <option value="13">Southeast</option>
+                    <option value="0">North-Northwest</option>
+                    <option value="3">North-Northeast</option>
+                    <option value="8">South-Southwest</option>
+                    <option value="11">South-Southeast</option>
+                    <option value="4">West-Northwest</option>
+                    <option value="6">West-Southwest</option>
+                    <option value="12">East-Northeast</option>
+                    <option value="14">East-Southeast</option>
+                  </select>
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="windspeed3pm">Wind Speed at 3pm (km/h)</label>
+                  <input
+                    type="text"
+                    id="windspeed3pm"
+                    name="windspeed3pm"
+                    placeholder="e.g. 22.0"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="winddir3pm">Wind Direction at 3pm</label>
+                  <select id="winddir3pm" name="winddir3pm" required>
+                    <option value="" disabled selected>Select direction</option>
+                    <option value="2">North</option>
+                    <option value="4">West</option>
+                    <option value="8">South</option>
+                    <option value="14">East</option>
+                    <option value="0">Northwest</option>
+                    <option value="11">Northeast</option>
+                    <option value="9">Southwest</option>
+                    <option value="10">Southeast</option>
+                    <option value="1">North-Northwest</option>
+                    <option value="5">North-Northeast</option>
+                    <option value="7">South-Southwest</option>
+                    <option value="12">South-Southeast</option>
+                    <option value="3">West-Northwest</option>
+                    <option value="6">West-Southwest</option>
+                    <option value="13">East-Northeast</option>
+                    <option value="15">East-Southeast</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Moisture Section -->
+          <div class="field-section">
+            <h3 class="field-title">Moisture Conditions</h3>
+            <div class="row">
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="rainfall">Rainfall (mm)</label>
+                  <input
+                    type="text"
+                    id="rainfall"
+                    name="rainfall"
+                    placeholder="e.g. 3.6"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="evaporation">Evaporation (mm)</label>
+                  <input
+                    type="text"
+                    id="evaporation"
+                    name="evaporation"
+                    placeholder="e.g. 4.2"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="humidity9am">Humidity at 9am (%)</label>
+                  <input
+                    type="text"
+                    id="humidity9am"
+                    name="humidity9am"
+                    placeholder="e.g. 65"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="humidity3pm">Humidity at 3pm (%)</label>
+                  <input
+                    type="text"
+                    id="humidity3pm"
+                    name="humidity3pm"
+                    placeholder="e.g. 45"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="raintoday">Did it Rain Today?</label>
+                  <select id="raintoday" name="raintoday" required>
+                    <option value="" disabled selected>Select answer</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pressure and Other -->
+          <div class="field-section">
+            <h3 class="field-title">Atmospheric Conditions</h3>
+            <div class="row">
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="pressure9am">Pressure at 9am (hPa)</label>
+                  <input
+                    type="text"
+                    id="pressure9am"
+                    name="pressure9am"
+                    placeholder="e.g. 1015.2"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="pressure3pm">Pressure at 3pm (hPa)</label>
+                  <input
+                    type="text"
+                    id="pressure3pm"
+                    name="pressure3pm"
+                    placeholder="e.g. 1010.5"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="cloud9am">Cloud Cover at 9am (oktas)</label>
+                  <input
+                    type="text"
+                    id="cloud9am"
+                    name="cloud9am"
+                    placeholder="e.g. 5"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="cloud3pm">Cloud Cover at 3pm (oktas)</label>
+                  <input
+                    type="text"
+                    id="cloud3pm"
+                    name="cloud3pm"
+                    placeholder="e.g. 6"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="sunshine">Sunshine (hours)</label>
+                  <input
+                    type="text"
+                    id="sunshine"
+                    name="sunshine"
+                    placeholder="e.g. 8.5"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Location & Date -->
+          <div class="field-section">
+            <h3 class="field-title">Location & Date</h3>
+            <div class="row">
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="date">Month (1-12)</label>
+                  <input
+                    type="number"
+                    id="date"
+                    name="date"
+                    min="1"
+                    max="12"
+                    placeholder="e.g. 5 for May"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="input-card">
+                <div class="input-group">
+                  <label for="location">Location</label>
+                  <select id="location" name="location" required>
+                    <option value="" disabled selected>Select location</option>
+                    <option value="24">Adelaide</option>
+                    <option value="7">Albany</option>
+                    <option value="30">Albury</option>
+                    <option value="46">Alice Springs</option>
+                    <option value="33">Badgerys Creek</option>
+                    <option value="14">Ballarat</option>
+                    <option value="36">Bendigo</option>
+                    <option value="21">Brisbane</option>
+                    <option value="2">Cairns</option>
+                    <option value="43">Cobar</option>
+                    <option value="9">Coffs Harbour</option>
+                    <option value="4">Dartmoor</option>
+                    <option value="11">Darwin</option>
+                    <option value="15">Gold Coast</option>
+                    <option value="17">Hobart</option>
+                    <option value="45">Katherine</option>
+                    <option value="23">Launceston</option>
+                    <option value="28">Melbourne</option>
+                    <option value="25">Melbourne Airport</option>
+                    <option value="44">Mildura</option>
+                    <option value="42">Moree</option>
+                    <option value="5">Mount Gambier</option>
+                    <option value="12">Mount Ginini</option>
+                    <option value="19">Newcastle</option>
+                    <option value="47">Nhil</option>
+                    <option value="13">Norah Head</option>
+                    <option value="6">Norfolk Island</option>
+                    <option value="32">Nuriootpa</option>
+                    <option value="40">Pearce RAAF</option>
+                    <option value="31">Penrith</option>
+                    <option value="26">Perth</option>
+                    <option value="35">Perth Airport</option>
+                    <option value="1">Portland</option>
+                    <option value="37">Richmond</option>
+                    <option value="27">Sale</option>
+                    <option value="41">Salmon Gums</option>
+                    <option value="10">Sydney</option>
+                    <option value="16">Sydney Airport</option>
+                    <option value="39">Townsville</option>
+                    <option value="34">Tuggeranong</option>
+                    <option value="49">Uluru</option>
+                    <option value="38">Wagga Wagga</option>
+                    <option value="3">Walpole</option>
+                    <option value="18">Watsonia</option>
+                    <option value="22">William Town</option>
+                    <option value="8">Witchcliffe</option>
+                    <option value="20">Wollongong</option>
+                    <option value="48">Woomera</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <button type="submit">Generate Prediction</button>
+        </div>
+      </form>
+    </section>
+
+    <script>
+      function navFunction(sectionId) {
+        // Hide all sections
+        document.getElementById("home").classList.add("hidden");
+        document.getElementById("about").classList.add("hidden");
+        document.getElementById("predict").classList.add("hidden");
+
+        // Remove active class from all nav items
+        document.getElementById("nav-home").classList.remove("active-nav");
+        document.getElementById("nav-about").classList.remove("active-nav");
+        document.getElementById("nav-predict").classList.remove("active-nav");
+
+        // Show selected section
+        document.getElementById(sectionId).classList.remove("hidden");
+
+        // Add active class to selected nav item
+        document.getElementById("nav-" + sectionId).classList.add("active-nav");
+      }
+    </script>
+  </body>
+</html>
