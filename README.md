@@ -63,10 +63,9 @@ rainfall-prediction-webapp/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/THAKURSUMIT1600/rainfall-prediction-webapp.git
+git clone https://github.com/THAKURSUMIT1600/Rainfall-Prediction-Webapp.git
 cd rainfall-prediction-webapp
 ```
-
 ### 2. Install Dependencies
 
 ```bash
